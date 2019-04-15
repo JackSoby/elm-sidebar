@@ -1,5 +1,6 @@
 module Data.Category exposing (Category, decodeCategoryList, decodeCategoryText, jsonDecoder)
 
+import Data.Product as Product exposing (..)
 import Data.ProductFilter as ProductFilter exposing (..)
 import Data.ProductSummary as ProductSummary exposing (..)
 import Json.Decode as Decode exposing (Decoder, field, int, maybe, nullable, string)

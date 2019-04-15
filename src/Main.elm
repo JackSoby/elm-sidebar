@@ -17,6 +17,7 @@ import Json.Decode as Decode exposing (..)
 import Json.Encode as Encode exposing (..)
 import List.Extra as ListExtra
 import Set
+import String.Extra as StringExtra
 
 
 type DropTarget
@@ -37,6 +38,7 @@ type alias Model =
     , configurations : List Configuration
     , selectedProductId : Maybe Int
     , dragDrop : DragDrop.Model ParentCategory DropTarget
+    , mappedConfigurations : Dict.Dict String String
     }
 
 
@@ -56,6 +58,7 @@ init =
       , selectedProductId = Nothing
       , selectedSubCategoryId = Nothing
       , dragDrop = DragDrop.init
+      , mappedConfigurations = Dict.empty
       }
     , getCategory
     )
@@ -194,7 +197,12 @@ update msg model =
         GetConfigurationsAndPriceRules result ->
             case result of
                 Ok val ->
-                    ( { model | priceRules = val.priceRules, configurations = val.configurations }, Cmd.none )
+                    let
+                        mappedConfigs =
+                            val.configurations
+                                |> List.foldr (\config acc -> Dict.union acc (Dict.singleton config.key config.name)) Dict.empty
+                    in
+                    ( { model | priceRules = val.priceRules, mappedConfigurations = mappedConfigs, configurations = val.configurations }, Cmd.none )
 
                 _ ->
                     ( model, Cmd.none )
@@ -320,12 +328,6 @@ displayProductInfo model product =
                                 div [] [ text config.name ]
                             )
 
-                reducedConfigs =
-                    model.configurations
-                        |> List.foldl
-                            (\config acc -> Dict.insert config.key config.name acc)
-                            Dict.empty
-
                 rules =
                     model.priceRules
                         |> List.map
@@ -335,7 +337,7 @@ displayProductInfo model product =
                                         rule.priceConditions
                                             |> List.foldr
                                                 (\con acc ->
-                                                    case Dict.get con.key reducedConfigs of
+                                                    case Dict.get con.key model.mappedConfigurations of
                                                         Just val ->
                                                             case acc == "" of
                                                                 True ->

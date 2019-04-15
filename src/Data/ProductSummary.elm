@@ -8,6 +8,7 @@ type alias ProductSummary =
     { id : Int
     , name : Maybe String
     , code : String
+    , partNumberTemplate : String
     , productFilterValues : Dict String (List String)
     }
 
@@ -24,8 +25,9 @@ decodeProductList =
 
 decodeProductSummaryText : Decode.Decoder ProductSummary
 decodeProductSummaryText =
-    Decode.map4 ProductSummary
+    Decode.map5 ProductSummary
         (field "id" Decode.int)
         (field "name" (nullable Decode.string))
         (field "code" Decode.string)
+        (field "partNumberTemplate" Decode.string)
         (field "productFilterValues" (Decode.dict (Decode.list Decode.string)))

@@ -1,11 +1,11 @@
-module Data.Product exposing (..)
+module Data.Product exposing (Product, decodeFullProductList, decodeProductText, jsonProductDecoder)
 
 import Data.AdditionalImage as AdditionalImage exposing (..)
 import Data.Configuration as Configuration exposing (..)
 import Data.Rule as Rule exposing (..)
 import Dict exposing (Dict)
 import Json.Decode as Decode exposing (Decoder, field, int, maybe, nullable, string)
-import Json.Decode.Pipeline exposing (decode, hardcoded, optional, required)
+import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 
 
 type alias Product =
@@ -29,9 +29,14 @@ jsonProductDecoder =
     Decode.field "data" decodeProductText
 
 
+decodeFullProductList : Decode.Decoder (List Product)
+decodeFullProductList =
+    Decode.list decodeProductText
+
+
 decodeProductText : Decode.Decoder Product
 decodeProductText =
-    decode Product
+    Decode.succeed Product
         |> Json.Decode.Pipeline.required "id" Decode.int
         |> Json.Decode.Pipeline.required "name" (nullable Decode.string)
         |> Json.Decode.Pipeline.required "code" Decode.string
