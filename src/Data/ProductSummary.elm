@@ -8,7 +8,7 @@ type alias ProductSummary =
     { id : Int
     , name : Maybe String
     , code : String
-    , partNumberTemplate : String
+    , partNumberTemplate : Maybe String
     , productFilterValues : Dict String (List String)
     }
 
@@ -29,5 +29,5 @@ decodeProductSummaryText =
         (field "id" Decode.int)
         (field "name" (nullable Decode.string))
         (field "code" Decode.string)
-        (field "partNumberTemplate" Decode.string)
+        (field "partNumberTemplate" (nullable Decode.string))
         (field "productFilterValues" (Decode.dict (Decode.list Decode.string)))
